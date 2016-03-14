@@ -1,0 +1,41 @@
+---
+
+- name: Download Spark
+  get_url: 
+    url="http://www.apache.org/dist/spark/spark-{{ spark_ver }}/spark-{{ spark_ver }}-bin-hadoop2.6.tgz"
+    dest="{{ spark_archive }}"
+    checksum="sha512:{{ spark_checksum }}"
+- name: Extract Spark
+  unarchive: 
+    src="{{ spark_archive }}"
+    dest="{{ spark_install_dir }}"
+    creates="spark-{{ spark_ver }}-bin-hadoop2.6"
+    copy=no
+- name: Update slaves
+  template:
+    backup=yes
+    dest="{{ spark_install_dir }}/spark-{{ spark_ver }}-bin-hadoop2.6/conf/slaves"
+    src=slaves.j2
+  notify:
+    - stop spark
+    - start spark
+- name: Configure network interface
+  template:
+    backup=yes
+    dest="{{ spark_install_dir }}/spark-{{ spark_ver }}-bin-hadoop2.6/conf/spark-env.sh"
+    src=spark-env.j2
+  notify:
+    - stop spark
+    - start spark
+- name: Configure spark-submit default
+  template:
+    backup=yes
+    dest="{{ spark_install_dir }}/spark-{{ spark_ver }}-bin-hadoop2.6/conf/spark-defaults.conf"
+    src=spark-defaults.j2
+  notify:
+    - stop spark
+    - start spark
+- name: Create directory for event logging
+  file: path="/tmp/spark-events" state=directory
+- name: Update PATH
+  lineinfile: dest="/home/{{ user }}/.profile" line="export PATH=$PATH:{{ spark_install_dir }}/spark-{{ spark_ver }}-bin-hadoop2.6/bin"

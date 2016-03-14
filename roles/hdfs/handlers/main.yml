@@ -1,0 +1,10 @@
+---
+
+- name: format hdfs
+  command: "{{ hadoop_install_dir }}/hadoop-{{ hadoop_ver }}/bin/hdfs namenode -format"
+- name: stop hdfs
+  command: "{{ hadoop_install_dir }}/hadoop-{{ hadoop_ver }}/sbin/stop-dfs.sh"
+  when: "inventory_hostname in groups['hdfs-master']"
+- name: start hdfs
+  command: "nohup {{ hadoop_install_dir }}/hadoop-{{ hadoop_ver }}/sbin/start-dfs.sh"
+  when: "inventory_hostname in groups['hdfs-master']"

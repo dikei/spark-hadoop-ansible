@@ -1,0 +1,12 @@
+---
+
+- name: Check if the ssh key exists
+  stat: path="/home/{{ user }}/.ssh/id_rsa"
+  register: ssh_key
+- name: Generate SSH key
+  command: "/usr/bin/ssh-keygen -b 2048 -P '' -f /home/{{ user }}/.ssh/id_rsa"
+  when: ssh_key.stat.exists == False
+- name: Transfer the public keys back to local server
+  fetch: dest=master_keys src="/home/{{ user }}/.ssh/id_rsa.pub"
+- name: Create known_hosts if necessary
+  file: name="/home/{{ user }}/.ssh/known_hosts" state=touch mode=0600

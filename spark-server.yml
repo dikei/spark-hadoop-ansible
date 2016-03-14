@@ -1,0 +1,37 @@
+---
+
+- name: Setup SSH key for spark slave servers
+  vars: 
+    master_pub_key: "{{ lookup('file', 'master_keys/' + groups['spark-master'][0] + '/home/' + user + '/.ssh/id_rsa.pub') }}"
+  hosts: spark-slaves
+  tasks:
+  - name: Authorize the Spark master server ssh key
+    authorized_key: user="{{ user }}" key="{{ master_pub_key }}" state=present
+
+- name: Trust the host keys
+  hosts: spark-master
+  tasks:
+  - name: Trust own host key
+    known_hosts:
+      name: "0.0.0.0"
+      key: "{{ '0.0.0.0 ecdsa-sha2-nistp256 ' + ansible_ssh_host_key_ecdsa_public }}"
+      state: present
+
+  - name: Trust the slaves host key using domain name
+    known_hosts: 
+      name: "{{ hostvars[item]['ansible_fqdn'] }}" 
+      key: "{{ hostvars[item]['ansible_fqdn'] + ' ecdsa-sha2-nistp256 ' + hostvars[item]['ansible_ssh_host_key_ecdsa_public'] }}" 
+      state: present
+    with_items: "{{ groups['spark-slaves'] }}"
+
+  - name: Trust the slaves host key using IP address
+    known_hosts: 
+      name: "{{ item }}" 
+      key: "{{ item + ' ecdsa-sha2-nistp256 ' + hostvars[item]['ansible_ssh_host_key_ecdsa_public'] }}" 
+      state: present
+    with_items: "{{ groups['hdfs-slaves'] }}"
+
+- name: Download and configure Spark on all server
+  hosts: spark
+  roles:
+    - { role: spark, force_build: False }

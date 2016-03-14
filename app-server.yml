@@ -1,0 +1,6 @@
+---
+
+- name: Upload and unpack the app
+  hosts: app
+  roles:
+    - { role: app }

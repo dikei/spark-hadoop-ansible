@@ -1,0 +1,23 @@
+---
+
+- name: Upgrade server's packages to latest version
+  become: yes
+  apt: upgrade=safe
+
+- name: Install packages
+  become: yes
+  apt: name={{ item }} state=latest
+  with_items:
+    - openjdk-7-jdk
+    - maven
+    - git
+
+- name: Update host files
+  become: yes
+  lineinfile:   
+    dest=/etc/hosts 
+    regexp='.*{{ hostvars[item]['ansible_fqdn'] }}$'
+    line="{{ item }} {{ hostvars[item]['ansible_fqdn'] }}"
+    state=present
+  when: hostvars[item].ansible_fqdn is defined
+  with_items: "{{ groups['all'] }}"

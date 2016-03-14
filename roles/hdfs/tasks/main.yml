@@ -1,0 +1,64 @@
+---
+
+- name: Download Hadoop
+  get_url: 
+    url="http://apache.mirrors.spacedump.net/hadoop/common/hadoop-{{ hadoop_ver }}/hadoop-{{ hadoop_ver }}.tar.gz"
+    dest="{{ hadoop_archive }}"
+    sha256sum="{{ hadoop_checksum }}"
+- name: Extract Hadoop 
+  unarchive: 
+    src="{{ hadoop_archive }}"
+    dest="{{ hadoop_install_dir }}"
+    creates="hadoop-{{ hadoop_ver }}"
+    copy=no
+- name: Update JAVA_HOME
+  replace:
+    backup=yes
+    dest="{{ hadoop_install_dir }}/hadoop-{{ hadoop_ver }}/etc/hadoop/hadoop-env.sh"
+    regexp="\$\{JAVA_HOME\}"
+    replace="/usr/lib/jvm/java-7-openjdk-amd64"
+- name: Update core-site.xml
+  template:
+    backup=yes
+    dest="{{ hadoop_install_dir }}/hadoop-{{ hadoop_ver }}/etc/hadoop/core-site.xml"
+    src=../templates/core-site.j2
+  notify:
+    - stop hdfs
+    - start hdfs
+- name: Create namenode directory
+  file: path="{{ namenode_dir }}" state=directory mode=0755
+- name: Create datanode directory
+  file: path="{{ datanode_dir }}" state=directory mode=0755
+- name: Update hdfs-site.xml
+  template:
+    backup=yes
+    dest="{{ hadoop_install_dir }}/hadoop-{{ hadoop_ver }}/etc/hadoop/hdfs-site.xml"
+    src=../templates/hdfs-site.j2
+  notify:
+  - stop hdfs
+  - start hdfs
+- name: Update slaves
+  template:
+    backup=yes
+    dest="{{ hadoop_install_dir }}/hadoop-{{ hadoop_ver }}/etc/hadoop/slaves"
+    src=../templates/slaves.j2
+  notify:
+    - stop hdfs
+    - start hdfs
+- name: Check if namenode is formatted
+  stat: path="{{ namenode_dir }}/current/VERSION"
+  register: namenode_ver
+  when: "inventory_hostname in groups['hdfs-master']"
+  changed_when: force_format == True or namenode_ver.stat.exists == False
+  notify:
+    - format hdfs
+- name: Check for HDFS's namenode pid
+  stat: path="/tmp/hadoop-{{ user }}-namenode.pid"
+  register: hadoop_namenode
+  when: "inventory_hostname in groups['hdfs-master']"
+  changed_when: hadoop_namenode.stat.exists == False
+  notify:
+    - start hdfs
+
+- name: Update PATH
+  lineinfile: dest="/home/{{ user }}/.profile" line="export PATH=$PATH:{{ hadoop_install_dir }}/hadoop-{{ hadoop_ver }}/bin"

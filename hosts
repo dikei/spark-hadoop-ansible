@@ -1,0 +1,49 @@
+[app]
+172.31.0.198 ansible_ssh_user="{{ user }}"
+
+[spark-master]
+172.31.0.198 ansible_ssh_user="{{ user }}"
+
+[spark-slaves]
+172.31.0.198 ansible_ssh_user="{{ user }}"
+172.31.0.202 ansible_ssh_user="{{ user }}"
+172.31.0.208 ansible_ssh_user="{{ user }}"
+172.31.0.209 ansible_ssh_user="{{ user }}"
+172.31.0.210 ansible_ssh_user="{{ user }}"
+172.31.0.211 ansible_ssh_user="{{ user }}"
+172.31.0.212 ansible_ssh_user="{{ user }}"
+172.31.0.213 ansible_ssh_user="{{ user }}"
+
+
+[hdfs-master]
+172.31.0.198 ansible_ssh_user="{{ user }}"
+
+[hdfs-slaves]
+172.31.0.198 ansible_ssh_user="{{ user }}"
+172.31.0.202 ansible_ssh_user="{{ user }}"
+172.31.0.208 ansible_ssh_user="{{ user }}"
+172.31.0.209 ansible_ssh_user="{{ user }}"
+172.31.0.210 ansible_ssh_user="{{ user }}"
+172.31.0.211 ansible_ssh_user="{{ user }}"
+172.31.0.212 ansible_ssh_user="{{ user }}"
+172.31.0.213 ansible_ssh_user="{{ user }}"
+
+
+[app]
+172.31.0.198 ansible_ssh_user="{{ user }}"
+
+[masters:children]
+spark-master
+hdfs-master
+
+[slaves:children]
+spark-slaves
+hdfs-slaves
+
+[spark:children]
+spark-master
+spark-slaves
+
+[hdfs:children]
+hdfs-master
+hdfs-slaves

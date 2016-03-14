@@ -1,0 +1,16 @@
+---
+
+- name: Common setup for all servers
+  hosts: all
+  remote_user: "{{ user }}"
+  roles: 
+    - common
+
+- name: Setup SSH key for master servers
+  hosts: masters
+  roles:
+    - master
+
+- include: hdfs-server.yml
+- include: spark-server.yml
+- include: app-server.yml

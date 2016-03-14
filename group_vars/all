@@ -1,0 +1,14 @@
+user: ubuntu
+hadoop_ver: 2.7.2
+hadoop_archive: "/home/{{ user }}/hadoop-{{ hadoop_ver }}.tar.gz"
+hadoop_install_dir: "/home/{{ user }}"
+hadoop_bin_dir: "{{ hadoop_install_dir }}/hadoop-{{ hadoop_ver }}/bin"
+namenode_dir: "/home/{{ user }}/HDFS/namenode"
+datanode_dir: "/home/{{ user }}/HDFS/datanode"
+hadoop_checksum: 49AD740F85D27FA39E744EB9E3B1D9442AE63D62720F0AABDAE7AA9A718B03F7 
+
+spark_ver: 1.6.1
+spark_archive: "/home/{{ user }}/spark-{{ spark_ver }}-bin-hadoop2.6.tgz"
+spark_install_dir: "/home/{{ user }}"
+spark_checksum: 49154D13D5B216C71556F8F5939B13F4A2A29623D02C49DC1B2F21228352F65DEFE831F9CFAF633BA7A0BD53833522BA51EB778654C8E49434439AFB5265246F
+spark_worker_memory: 5g

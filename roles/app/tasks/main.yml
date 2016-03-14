@@ -1,0 +1,7 @@
+---
+
+- name: Create app directory
+  file: path="/home/{{ user }}/thesis" state=directory
+
+- name: Upload and unpack the apps
+  unarchive: src="thesis.tar.gz"  dest="/home/{{ user }}/thesis"
