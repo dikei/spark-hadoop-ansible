@@ -11,6 +11,6 @@
   roles:
     - master
 
-include: hdfs-server.yml
-include: spark-server.yml
-include: app-server.yml
+- include: hdfs-server.yml
+- include: spark-server.yml
+- include: app-server.yml
