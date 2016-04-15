@@ -10,7 +10,7 @@
 - name: Build Spark
   environment: 
     MAVEN_OPTS: "-Xmx2g -XX:MaxPermSize=512M -XX:ReservedCodeCacheSize=512m" 
-  command: mvn -DskipTests=true clean package 
+  command: mvn -DskipTests=true -Phadoop-2.4 -Dhadoop.version=2.4.0 clean package 
   args:
     chdir: "{{ spark_git_dir }}"
   when: "build == 1"
