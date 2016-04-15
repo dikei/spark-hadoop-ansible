@@ -1,8 +1,8 @@
 ---
 
 - name: stop spark
-  command: "{{ spark_install_dir }}/spark-{{ spark_ver }}-bin-hadoop2.6/sbin/stop-all.sh"
+  command: "{{ spark_git_dir }}/sbin/stop-all.sh"
   when: "inventory_hostname in groups['spark-master']"
 - name: start spark
-  command: "nohup {{ spark_install_dir }}/spark-{{ spark_ver }}-bin-hadoop2.6/sbin/start-all.sh"
+  command: "nohup {{ spark_git_dir }}/sbin/start-all.sh"
   when: "inventory_hostname in groups['spark-master']"
