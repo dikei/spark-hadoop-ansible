@@ -1,8 +1,21 @@
 ---
 
-- name: Upgrade server's packages to latest version
+- name: Add addition repository
   become: yes
-  apt: upgrade=safe
+  apt_repository:
+    repo="{{ item }}"
+  with_items:
+    - 'ppa:collectd/collectd-5.5'
+    - 'deb http://nova.clouds.archive.ubuntu.com/ubuntu {{ansible_distribution_release}} multiverse'
+    - 'deb-src http://nova.clouds.archive.ubuntu.com/ubuntu {{ansible_distribution_release}} multiverse'
+    - 'deb http://nova.clouds.archive.ubuntu.com/ubuntu {{ansible_distribution_release}}-updates multiverse'
+    - 'deb-src http://nova.clouds.archive.ubuntu.com/ubuntu {{ansible_distribution_release}}-updates multiverse'
+    - 'deb http://nova.clouds.archive.ubuntu.com/ubuntu {{ansible_distribution_release}}-backports main restricted universe multiverse'
+    - 'deb-src http://nova.clouds.archive.ubuntu.com/ubuntu {{ansible_distribution_release}}-backports main restricted universe multiverse'
+
+- name: Upgrade server packages to latest version
+  become: yes
+  apt: upgrade=safe update_cache=yes
 
 - name: Install packages
   become: yes
@@ -11,7 +24,10 @@
     - openjdk-7-jdk
     - maven
     - git
-
+    - collectd
+    - stress-ng
+    - htop
+    
 - name: Update host files
   become: yes
   lineinfile:   
