@@ -13,6 +13,7 @@
   command: mvn -DskipTests=true clean package 
   args:
     chdir: "{{ spark_git_dir }}"
+  when: "build == 1"
     
 - name: Update slaves
   template:

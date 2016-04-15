@@ -15,4 +15,5 @@ spark_worker_memory: 4g
 spark_git_dir: "/home/{{ user }}/spark-git/2387"
 spark_git_repo: "https://github.com/lianhuiwang/spark.git"
 spark_git_branch: "SPARK-2387"
+build: 0
 
