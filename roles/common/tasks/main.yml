@@ -37,3 +37,12 @@
     state=present
   when: hostvars[item].ansible_fqdn is defined
   with_items: "{{ groups['all'] }}"
+
+- name: Update collectd configuration
+  become: yes
+  template:
+    backup=yes
+    dest="/etc/collectd/collectd.conf"
+    src="collectd.j2"
+  notify:
+    - restart collectd
