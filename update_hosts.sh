@@ -4,6 +4,8 @@ HOSTS=$(nova --no-cache list | awk '{ print $8 }' | grep public | sed 's/public=
 
 readarray -t HOSTS_ARR <<< "$HOSTS"
 
+HOSTS_COUNT=${#HOSTS_ARR[@]}
+
 SLAVES=""
 for ip in "${HOSTS_ARR[@]}"
 do
@@ -12,26 +14,25 @@ do
 '
 done
 
-MASTER=${HOSTS_ARR[0]}
+SPARK_MASTER=${HOSTS_ARR[0]}
+APP_MASTER=${HOSTS_ARR[0]}
+HDFS_MASTER=${HOSTS_ARR[HOSTS_COUNT - 1]}
 
 cat << EOF
 [app]
-$MASTER ansible_ssh_user="{{ user }}"
+$APP_MASTER ansible_ssh_user="{{ user }}"
 
 [spark-master]
-$MASTER ansible_ssh_user="{{ user }}"
+$SPARK_MASTER ansible_ssh_user="{{ user }}"
 
 [spark-slaves]
 $SLAVES
 
 [hdfs-master]
-$MASTER ansible_ssh_user="{{ user }}"
+$HDFS_MASTER ansible_ssh_user="{{ user }}"
 
 [hdfs-slaves]
 $SLAVES
-
-[app]
-$MASTER ansible_ssh_user="{{ user }}"
 
 [masters:children]
 spark-master
