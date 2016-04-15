@@ -3,8 +3,8 @@ hadoop_ver: 2.7.2
 hadoop_archive: "/home/{{ user }}/hadoop-{{ hadoop_ver }}.tar.gz"
 hadoop_install_dir: "/home/{{ user }}"
 hadoop_bin_dir: "{{ hadoop_install_dir }}/hadoop-{{ hadoop_ver }}/bin"
-namenode_dir: "/home/{{ user }}/HDFS/namenode"
-datanode_dir: "/home/{{ user }}/HDFS/datanode"
+namenode_dir: "/mnt/HDFS/namenode"
+datanode_dir: "/mnt/HDFS/datanode"
 hadoop_checksum: 49AD740F85D27FA39E744EB9E3B1D9442AE63D62720F0AABDAE7AA9A718B03F7 
 
 spark_ver: 1.6.1
