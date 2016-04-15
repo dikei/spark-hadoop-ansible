@@ -1,3 +1,4 @@
 hosts
+playbook.retry
 *.tar.gz
 *.txt.gz
