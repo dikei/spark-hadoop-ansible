@@ -45,5 +45,15 @@
 - name: Create directory for event logging
   file: path="/tmp/spark-events" state=directory
 
+- name: Remove old spark PATH if necessary
+  lineinfile: 
+    dest="/home/{{ user }}/.profile" 
+    regexp="export PATH=\\$PATH:{{ spark_install_dir }}/spark-{{ spark_ver }}-bin-hadoop2.6/bin"
+    state=absent
+
 - name: Update PATH
-  lineinfile: dest="/home/{{ user }}/.profile" line="export PATH=$PATH:{{ spark_install_dir }}/spark-{{ spark_ver }}-bin-hadoop2.6/bin"
+  lineinfile:
+    dest="/home/{{ user }}/.profile"
+    line="export PATH=$PATH:{{ spark_git_dir }}/bin"
+    state=present
+
