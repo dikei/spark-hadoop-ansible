@@ -27,6 +27,7 @@
     - collectd
     - stress-ng
     - htop
+    - ntp
     
 - name: Update host files
   become: yes
