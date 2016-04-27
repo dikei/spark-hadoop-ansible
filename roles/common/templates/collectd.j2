@@ -14,7 +14,7 @@
 
 #Hostname "localhost"
 FQDNLookup true
-BaseDir "/mnt/collectd"
+BaseDir "/var/lib/collectd"
 #PluginDir "/usr/lib/collectd"
 #TypesDB "/usr/share/collectd/types.db" "/etc/collectd/my_types.db"
 
@@ -32,11 +32,12 @@ BaseDir "/mnt/collectd"
 #       Interval 60                                                          #
 #   </LoadPlugin>                                                            #
 #----------------------------------------------------------------------------#
-Interval 1
+Interval 2
+MaxReadInterval 8
+Timeout 10
 
-#Timeout 2
 #ReadThreads 5
-#WriteThreads 5
+WriteThreads 1
 
 # Limit the size of the write queue. Default is no limit. Setting up a limit
 # is recommended for servers handling a high volume of traffic.
@@ -135,7 +136,7 @@ LoadPlugin network
 #LoadPlugin ping
 #LoadPlugin postgresql
 #LoadPlugin powerdns
-LoadPlugin processes
+#LoadPlugin processes
 #LoadPlugin protocols
 #<LoadPlugin python>
 #	Globals true
@@ -146,7 +147,7 @@ LoadPlugin rrdtool
 #LoadPlugin serial
 #LoadPlugin snmp
 #LoadPlugin statsd
-LoadPlugin swap
+#LoadPlugin swap
 #LoadPlugin table
 #LoadPlugin tail
 #LoadPlugin tail_csv
@@ -834,13 +835,13 @@ LoadPlugin swap
 #</Plugin>
 
 <Plugin rrdtool>
-	DataDir "/mnt/collectd/rrd"
+	DataDir "/var/lib/collectd/rrd"
         RRARows 86400
 	CacheTimeout 120
 	CacheFlush 900
 	WritesPerSecond 30
-#	CreateFilesAsync false
-#	RandomTimeout 0
+	CreateFilesAsync false
+	RandomTimeout 5
 #
 # The following settings are rather advanced
 # and should usually not be touched:

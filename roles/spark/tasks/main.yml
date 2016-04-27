@@ -2,7 +2,6 @@
 
 - name: Cloning Spark Git repository
   git:
-    depth=1
     dest="{{ spark_git_dir }}"
     repo="{{ spark_git_repo }}"
     version="{{ spark_git_branch }}"
