@@ -5,11 +5,12 @@
     dest="{{ spark_git_dir }}"
     repo="{{ spark_git_repo }}"
     version="{{ spark_git_branch }}"
+    update=true
 
 - name: Build Spark
   environment: 
     MAVEN_OPTS: "-Xmx2g -XX:MaxPermSize=512M -XX:ReservedCodeCacheSize=512m" 
-  command: mvn -DskipTests=true -Phadoop-2.4 -Dhadoop.version=2.4.0 clean package 
+  command: build/mvn --force -DskipTests=true -T1C -Phadoop-2.4 -Dhadoop.version=2.4.0 clean package 
   args:
     chdir: "{{ spark_git_dir }}"
   when: "build == 1"
@@ -43,6 +44,9 @@
 
 - name: Create directory for event logging
   file: path="/tmp/spark-events" state=directory
+
+- name: Create directory on ramdisk for shuffle
+  file: path="{{ spark_local_dir }}" state=directory
 
 - name: Remove old spark PATH if necessary
   lineinfile: 

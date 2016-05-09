@@ -22,6 +22,6 @@
 spark.master                     spark://{{ groups['spark-master'][0] }}:7077
 spark.eventLog.enabled	true
 spark.eventLog.dir /tmp/spark-events
-spark.executor.memory              {{ spark_worker_memory }}
+spark.executor.memory              {{ spark_executor_memory }}
 # spark.serializer                 org.apache.spark.serializer.KryoSerializer
 # spark.executor.extraJavaOptions  -XX:+PrintGCDetails -Dkey=value -Dnumbers="one two three"

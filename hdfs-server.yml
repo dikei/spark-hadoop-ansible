@@ -13,9 +13,14 @@
   tasks:
   - name: Trust own host key
     known_hosts:
-      name: "0.0.0.0"
-      key: "{{ '0.0.0.0 ecdsa-sha2-nistp256 ' + ansible_ssh_host_key_ecdsa_public }}"
+      name: "{{ item }}"
+      key: "{{ item + ' ecdsa-sha2-nistp256 ' + ansible_ssh_host_key_ecdsa_public }}"
       state: present
+    with_items:
+      - "0.0.0.0"
+      - "{{ ansible_fqdn }}"
+      - "{{ ansible_default_ipv4.address}}"
+
   - name: Trust the slaves host key using domain name
     known_hosts: 
       name: "{{ hostvars[item]['ansible_fqdn'] }}" 

@@ -7,7 +7,7 @@ readarray -t HOSTS_ARR <<< "$HOSTS"
 HOSTS_COUNT=${#HOSTS_ARR[@]}
 
 SLAVES=""
-for ip in "${HOSTS_ARR[@]}"
+for ip in "${HOSTS_ARR[@]:1}"
 do
         SLAVES+="$ip ansible_ssh_user=\"{{ user }}\""
 	SLAVES+='
@@ -16,7 +16,7 @@ done
 
 SPARK_MASTER=${HOSTS_ARR[0]}
 APP_MASTER=${HOSTS_ARR[0]}
-HDFS_MASTER=${HOSTS_ARR[HOSTS_COUNT - 1]}
+HDFS_MASTER=${HOSTS_ARR[0]}
 
 cat << EOF
 [app]
