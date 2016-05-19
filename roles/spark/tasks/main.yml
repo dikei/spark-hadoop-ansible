@@ -10,10 +10,18 @@
 - name: Build Spark
   environment: 
     MAVEN_OPTS: "-Xmx2g -XX:MaxPermSize=512M -XX:ReservedCodeCacheSize=512m" 
-  command: build/mvn --force -DskipTests=true -T1C -Phadoop-2.4 -Dhadoop.version=2.4.0 clean package 
+  command: build/mvn --force -DskipTests=true -T1C -Phadoop-2.6 -Dhadoop.version=2.6.0 clean package 
   args:
     chdir: "{{ spark_git_dir }}"
   when: "build == 1"
+
+- name: Build Spark Incremental
+  environment: 
+    MAVEN_OPTS: "-Xmx2g -XX:MaxPermSize=512M -XX:ReservedCodeCacheSize=512m" 
+  command: build/mvn --force -DskipTests=true -T1C -Phadoop-2.6 -Dhadoop.version=2.6.0 package 
+  args:
+    chdir: "{{ spark_git_dir }}"
+  when: "build == 2"
     
 - name: Update slaves
   template:

@@ -142,7 +142,9 @@ LoadPlugin network
 #	Globals true
 #</LoadPlugin>
 #LoadPlugin rrdcached
+{% if inventory_hostname in groups['app'] %}
 LoadPlugin rrdtool
+{% endif %}
 #LoadPlugin sensors
 #LoadPlugin serial
 #LoadPlugin snmp
@@ -597,7 +599,7 @@ LoadPlugin rrdtool
 
 <Plugin network>
 
-{% if ansible_default_ipv4['address'] == groups['app'][0]  %}
+{% if inventory_hostname in groups['app'] %}
     Listen "{{ ansible_default_ipv4['address'] }}"
 {% else %}
     Server "{{ groups['app'][0] }}"
@@ -835,7 +837,7 @@ LoadPlugin rrdtool
 #</Plugin>
 
 <Plugin rrdtool>
-	DataDir "/var/lib/collectd/rrd"
+	DataDir "/mnt/collectd/rrd"
         RRARows 86400
 	CacheTimeout 120
 	CacheFlush 900
