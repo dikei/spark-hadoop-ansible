@@ -1,41 +1,80 @@
 ---
 
-- name: Download Spark
-  get_url: 
-    url="http://www.apache.org/dist/spark/spark-{{ spark_ver }}/spark-{{ spark_ver }}-bin-hadoop2.6.tgz"
-    dest="{{ spark_archive }}"
-    checksum="sha512:{{ spark_checksum }}"
-- name: Extract Spark
-  unarchive: 
-    src="{{ spark_archive }}"
-    dest="{{ spark_install_dir }}"
-    creates="spark-{{ spark_ver }}-bin-hadoop2.6"
-    copy=no
+- name: Cloning Spark Git repository
+  retries: 10
+  until: "'failed' not in repos"
+  git:
+    dest="{{ spark_git_dir }}"
+    repo="{{ spark_git_repo }}"
+    version="{{ spark_git_branch }}"
+    update=true
+  register: repos
+
+- name: Build Spark
+  environment: 
+    MAVEN_OPTS: "-Xmx2g -XX:MaxPermSize=512M -XX:ReservedCodeCacheSize=512m" 
+  command: build/mvn --force -DskipTests=true -T1C -Phadoop-2.6 -Dhadoop.version=2.6.0 clean package 
+  args:
+    chdir: "{{ spark_git_dir }}"
+  when: (repos.changed and "{{ build }}" == "1" )
+  notify:
+    - stop spark
+    - start spark
+
+- name: Build Spark Incremental
+  environment: 
+    MAVEN_OPTS: "-Xmx2g -XX:MaxPermSize=512M -XX:ReservedCodeCacheSize=512m" 
+  command: build/mvn --force -DskipTests=true -T1C -Phadoop-2.6 -Dhadoop.version=2.6.0 package 
+  args:
+    chdir: "{{ spark_git_dir }}"
+  when: (repos.changed and "{{ build }}" == "2")
+  notify:
+    - stop spark
+    - start spark
+    
 - name: Update slaves
   template:
     backup=yes
-    dest="{{ spark_install_dir }}/spark-{{ spark_ver }}-bin-hadoop2.6/conf/slaves"
+    dest="{{ spark_git_dir }}/conf/slaves"
     src=slaves.j2
   notify:
     - stop spark
     - start spark
+
 - name: Configure network interface
   template:
     backup=yes
-    dest="{{ spark_install_dir }}/spark-{{ spark_ver }}-bin-hadoop2.6/conf/spark-env.sh"
+    dest="{{ spark_git_dir }}/conf/spark-env.sh"
     src=spark-env.j2
   notify:
     - stop spark
     - start spark
+
 - name: Configure spark-submit default
   template:
     backup=yes
-    dest="{{ spark_install_dir }}/spark-{{ spark_ver }}-bin-hadoop2.6/conf/spark-defaults.conf"
+    dest="{{ spark_git_dir }}/conf/spark-defaults.conf"
     src=spark-defaults.j2
   notify:
     - stop spark
     - start spark
+
 - name: Create directory for event logging
   file: path="/tmp/spark-events" state=directory
+
+- name: Create directory for shuffle
+  become: yes
+  file: path="{{ spark_local_dir }}" state=directory owner="{{ user }}" group="{{ group }}"
+
+- name: Remove old spark PATH if necessary
+  lineinfile: 
+    dest="/home/{{ user }}/.profile" 
+    regexp="export PATH=\\$PATH:{{ spark_install_dir }}/spark-{{ spark_ver }}-bin-hadoop2.6/bin"
+    state=absent
+
 - name: Update PATH
-  lineinfile: dest="/home/{{ user }}/.profile" line="export PATH=$PATH:{{ spark_install_dir }}/spark-{{ spark_ver }}-bin-hadoop2.6/bin"
+  lineinfile:
+    dest="/home/{{ user }}/.profile"
+    line="export PATH=$PATH:{{ spark_git_dir }}/bin"
+    state=present
+

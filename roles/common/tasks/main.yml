@@ -6,12 +6,14 @@
     repo="{{ item }}"
   with_items:
     - 'ppa:collectd/collectd-5.5'
-    - 'deb http://nova.clouds.archive.ubuntu.com/ubuntu {{ansible_distribution_release}} multiverse'
-    - 'deb-src http://nova.clouds.archive.ubuntu.com/ubuntu {{ansible_distribution_release}} multiverse'
-    - 'deb http://nova.clouds.archive.ubuntu.com/ubuntu {{ansible_distribution_release}}-updates multiverse'
-    - 'deb-src http://nova.clouds.archive.ubuntu.com/ubuntu {{ansible_distribution_release}}-updates multiverse'
-    - 'deb http://nova.clouds.archive.ubuntu.com/ubuntu {{ansible_distribution_release}}-backports main restricted universe multiverse'
-    - 'deb-src http://nova.clouds.archive.ubuntu.com/ubuntu {{ansible_distribution_release}}-backports main restricted universe multiverse'
+    #- 'deb http://nova.clouds.archive.ubuntu.com/ubuntu {{ansible_distribution_release}} multiverse'
+    #- 'deb-src http://nova.clouds.archive.ubuntu.com/ubuntu {{ansible_distribution_release}} multiverse'
+    - 'deb http://nova.clouds.archive.ubuntu.com/ubuntu {{ansible_distribution_release}}-security multiverse'
+    - 'deb-src http://nova.clouds.archive.ubuntu.com/ubuntu {{ansible_distribution_release}}-security multiverse'
+    #- 'deb http://nova.clouds.archive.ubuntu.com/ubuntu {{ansible_distribution_release}}-updates multiverse'
+    #- 'deb-src http://nova.clouds.archive.ubuntu.com/ubuntu {{ansible_distribution_release}}-updates multiverse'
+    #- 'deb http://nova.clouds.archive.ubuntu.com/ubuntu {{ansible_distribution_release}}-backports main restricted universe multiverse'
+    #- 'deb-src http://nova.clouds.archive.ubuntu.com/ubuntu {{ansible_distribution_release}}-backports main restricted universe multiverse'
 
 - name: Upgrade server packages to latest version
   become: yes
@@ -28,16 +30,21 @@
     - stress-ng
     - htop
     - ntp
+    - haveged
     
 - name: Update host files
   become: yes
-  lineinfile:   
-    dest=/etc/hosts 
-    regexp='.*{{ hostvars[item]['ansible_fqdn'] }}$'
-    line="{{ item }} {{ hostvars[item]['ansible_fqdn'] }}"
-    state=present
-  when: hostvars[item].ansible_fqdn is defined
-  with_items: "{{ groups['all'] }}"
+  template:
+    dest=/etc/hosts
+    src=hosts.j2
+    backup=yes
+#  lineinfile:   
+#    dest=/etc/hosts 
+#    regexp='.*{{ hostvars[item]['ansible_fqdn'] }}$'
+#    line="{{ item }} {{ hostvars[item]['ansible_fqdn'] }}"
+#    state=present
+#  when: hostvars[item].ansible_fqdn is defined
+#  with_items: "{{ groups['all'] }}"
 
 - name: Update collectd configuration
   become: yes

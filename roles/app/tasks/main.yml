@@ -6,5 +6,6 @@
 - name: Upload and unpack the apps
   unarchive: src="thesis.tar.gz"  dest="/home/{{ user }}/thesis"
 
-- name: Upload the data for page rank
-  copy: src="soc-LiveJournal1.txt.gz" dest="/home/{{ user }}/thesis/thesis"
+- name: Upload text file
+  copy: src="big.txt" dest="/home/{{ user }}/thesis/thesis"
+
