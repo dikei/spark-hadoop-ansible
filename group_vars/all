@@ -1,4 +1,5 @@
 user: ubuntu
+group: ubuntu
 hadoop_ver: 2.7.2
 hadoop_archive: "/home/{{ user }}/hadoop-{{ hadoop_ver }}.tar.gz"
 hadoop_install_dir: "/home/{{ user }}"
@@ -16,6 +17,6 @@ spark_executor_memory: 12g
 spark_git_dir: "/home/{{ user }}/spark-git/thesis"
 spark_git_repo: "https://github.com/dikei/spark.git"
 spark_git_branch: "thesis_testing"
-spark_local_dir: "/tmp/spark-localdir"
+spark_local_dir: "/mnt/spark-localdir"
 build: 2
 

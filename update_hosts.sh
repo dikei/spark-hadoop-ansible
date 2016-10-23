@@ -1,22 +1,24 @@
 #!/bin/bash
 
-HOSTS=$(nova --no-cache list | awk '{ print $8 }' | grep public | sed 's/public=//' | sort)
+MASTER=$(nova --no-cache list | grep MASTER | awk '{ print $8 }' | grep public | sed 's/public=//' | sort)
+
+HOSTS=$(nova --no-cache list | grep -v MASTER | awk '{ print $8 }' | grep public | sed 's/public=//' | sort)
 
 readarray -t HOSTS_ARR <<< "$HOSTS"
 
 HOSTS_COUNT=${#HOSTS_ARR[@]}
 
 SLAVES=""
-for ip in "${HOSTS_ARR[@]:1}"
+for ip in "${HOSTS_ARR[@]}"
 do
         SLAVES+="$ip ansible_ssh_user=\"{{ user }}\""
 	SLAVES+='
 '
 done
 
-SPARK_MASTER=${HOSTS_ARR[0]}
-APP_MASTER=${HOSTS_ARR[0]}
-HDFS_MASTER=${HOSTS_ARR[0]}
+SPARK_MASTER=${MASTER}
+APP_MASTER=${MASTER}
+HDFS_MASTER=${MASTER}
 
 cat << EOF
 [app]

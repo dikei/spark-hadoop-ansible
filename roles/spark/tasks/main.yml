@@ -1,11 +1,14 @@
 ---
 
 - name: Cloning Spark Git repository
+  retries: 10
+  until: "'failed' not in repos"
   git:
     dest="{{ spark_git_dir }}"
     repo="{{ spark_git_repo }}"
     version="{{ spark_git_branch }}"
     update=true
+  register: repos
 
 - name: Build Spark
   environment: 
@@ -13,7 +16,10 @@
   command: build/mvn --force -DskipTests=true -T1C -Phadoop-2.6 -Dhadoop.version=2.6.0 clean package 
   args:
     chdir: "{{ spark_git_dir }}"
-  when: "build == 1"
+  when: (repos.changed and "{{ build }}" == "1" )
+  notify:
+    - stop spark
+    - start spark
 
 - name: Build Spark Incremental
   environment: 
@@ -21,7 +27,10 @@
   command: build/mvn --force -DskipTests=true -T1C -Phadoop-2.6 -Dhadoop.version=2.6.0 package 
   args:
     chdir: "{{ spark_git_dir }}"
-  when: "build == 2"
+  when: (repos.changed and "{{ build }}" == "2")
+  notify:
+    - stop spark
+    - start spark
     
 - name: Update slaves
   template:
@@ -53,8 +62,9 @@
 - name: Create directory for event logging
   file: path="/tmp/spark-events" state=directory
 
-- name: Create directory on ramdisk for shuffle
-  file: path="{{ spark_local_dir }}" state=directory
+- name: Create directory for shuffle
+  become: yes
+  file: path="{{ spark_local_dir }}" state=directory owner="{{ user }}" group="{{ group }}"
 
 - name: Remove old spark PATH if necessary
   lineinfile: 
